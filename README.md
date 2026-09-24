@@ -136,3 +136,17 @@ También se incorporó un respaldo local de la fábrica mediante JSON: **RESPALD
 **Un solo flujo de producción + muchos presets internos.**
 
 El objetivo es que agregar un nuevo rubro o variante aumente la capacidad de fabricación, no la complejidad de uso.
+
+## V2.4 — Centro de producción → entrega
+La fábrica ahora conecta el proyecto completo con su salida comercial: ficha → perfil → oferta → personalización → vista → control → presentación → pieza HTML → registro de entrega.
+
+### Capa de producción interna
+- Estado de proyecto: borrador / preparado / entregado.
+- Requisitos variables por perfil comercial.
+- Detección de datos faltantes antes de entregar.
+- Registro local de cantidad y fecha de entregas.
+- Presentación resumida copiable para WhatsApp.
+- Pieza HTML exportable desde el mismo centro de entrega.
+- La estructura funcional congelada se mantiene; esta capa agrega inteligencia de producción y entrega.
+
+**Principio:** el operador ve pocas decisiones; la fábrica resuelve muchas por detrás.
