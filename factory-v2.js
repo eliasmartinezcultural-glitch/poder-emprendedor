@@ -8,18 +8,9 @@ const THEMES={
   elegante:{name:"Elegante",desc:"Sobrio y cuidado",ink:"#171717",accent:"#9d835b",paper:"#f1efea"},
   profesional:{name:"Profesional",desc:"Claro y sólido",ink:"#23463c",accent:"#73927e",paper:"#eef2ef"}
 };
-const RUBROS={
-  Panadería:["Pan casero","Facturas","Torta"],
-  Gastronomía:["Menú del día","Promo familiar","Postre"],
-  Peluquería:["Corte","Color","Peinado"],
-  Fotografía:["Sesión de fotos","Fotos de producto","Cobertura"],
-  Artesanía:["Producto destacado","Personalizado","Regalo"],
-  Productor:["Producto de temporada","Caja / combo","Pedido especial"],
-  Profesor:["Clase individual","Clase grupal","Apoyo personalizado"],
-  Servicios:["Servicio principal","Presupuesto","Servicio especial"],
-  Tienda:["Producto destacado","Promoción","Pedido especial"],
-  "": ["Producto destacado","Promoción","Pedido especial"]
-};
+const PERFILES={Panadería:{theme:"calido",layout:"cards",hero:"photo",cta:"Consultar por WhatsApp",tag:"Hecho cerca. Hecho para vos.",copy:"Productos de elaboración cercana, presentados de forma simple para consultar y pedir.",offers:["Pan casero","Facturas","Tortas y pedidos"]},Gastronomía:{theme:"comercial",layout:"featured",hero:"photo",cta:"Reservar / consultar",tag:"Comida hecha para compartir.",copy:"Una propuesta gastronómica cercana, con opciones claras para pedir, reservar o consultar.",offers:["Menú del día","Promo familiar","Postre casero"]},Peluquería:{theme:"elegante",layout:"cards",hero:"immersive",cta:"Reservar turno",tag:"Tu estilo, bien hecho.",copy:"Servicios pensados para cuidar tu imagen, tu tiempo y el resultado final.",offers:["Corte","Color","Peinado"]},Fotografía:{theme:"elegante",layout:"featured",hero:"immersive",cta:"Consultar disponibilidad",tag:"Historias que quedan.",copy:"Fotografía para personas, productos y momentos que merecen quedar bien contados.",offers:["Sesión de fotos","Fotos de producto","Cobertura"]},Artesanía:{theme:"calido",layout:"cards",hero:"photo",cta:"Consultar producto",tag:"Hecho a mano, cerca.",copy:"Piezas realizadas con identidad propia, listas para regalar, usar o encargar.",offers:["Producto destacado","Personalizado","Regalo"]},Productor:{theme:"profesional",layout:"featured",hero:"photo",cta:"Consultar disponibilidad",tag:"Producción local, directo a vos.",copy:"Producción local con información clara sobre disponibilidad, pedidos y formatos de entrega.",offers:["Producto de temporada","Caja / combo","Pedido especial"]},Profesor:{theme:"profesional",layout:"list",hero:"minimal",cta:"Consultar clases",tag:"Aprender con acompañamiento.",copy:"Clases y acompañamiento adaptados a cada persona y objetivo.",offers:["Clase individual","Clase grupal","Apoyo personalizado"]},Servicios:{theme:"profesional",layout:"list",hero:"minimal",cta:"Pedir presupuesto",tag:"Soluciones claras y cercanas.",copy:"Un servicio concreto, explicado de forma sencilla y listo para consultar.",offers:["Servicio principal","Presupuesto","Servicio especial"]},Tienda:{theme:"comercial",layout:"cards",hero:"photo",cta:"Consultar producto",tag:"Elegí. Consultá. Comprá.",copy:"Una selección clara de productos para mirar, consultar y pedir desde el celular.",offers:["Producto destacado","Promoción","Pedido especial"]},"":{theme:"calido",layout:"cards",hero:"photo",cta:"Consultar por WhatsApp",tag:"Hecho cerca. Hecho para vos.",copy:"Una propuesta local, clara y fácil de consultar.",offers:["Producto destacado","Promoción","Pedido especial"]}};
+const VARIANTES={Panadería:["Mostrador local","Pedidos y tortas","Producción artesanal"],Gastronomía:["Menú diario","Comida para llevar","Eventos y reservas"],Peluquería:["Turnos rápidos","Color y tratamientos","Experiencia premium"],Fotografía:["Sesiones","Producto y comercio","Eventos"],Artesanía:["Regalos","Personalizados","Colección"],Productor:["Venta directa","Cajas y combos","Temporada"],Profesor:["Clases","Apoyo","Talleres"],Servicios:["Servicio directo","Presupuesto","Servicio premium"],Tienda:["Catálogo","Promociones","Productos destacados"]};
+const RUBROS=Object.fromEntries(Object.entries(PERFILES).map(([k,v])=>[k,v.offers]));
 
 let S=load();
 function load(){
@@ -39,14 +30,14 @@ function personalize(p){
   p.layout=p.layout||"cards"; p.heroStyle=p.heroStyle||"photo"; p.logo=p.logo||"";
   p.tagline=p.tagline||""; p.locationLabel=p.locationLabel||""; p.showPrice=p.showPrice!==false;
   p.showInstagram=p.showInstagram!==false; p.showAddress=p.showAddress!==false; p.showHours=p.showHours!==false;
-  p.buttonStyle=p.buttonStyle||"solid"; p.footerNote=p.footerNote||"";
+  p.buttonStyle=p.buttonStyle||"solid"; p.footerNote=p.footerNote||""; p.profile=p.profile||profileKey(p); p.variant=p.variant||"";
   return p;
 }
 function normalize(p){
   p.products=(p.products||[]).map(x=>({name:x.name||"",description:x.description||"",price:x.price||"",image:x.image||""}));
   p.style=p.style||"calido"; p.category=p.category||""; p.description=p.description||"";
   p.whatsapp=p.whatsapp||""; p.instagram=p.instagram||""; p.address=p.address||""; p.hours=p.hours||"";
-  p.hero=p.hero||""; p.cta=p.cta||"Consultar por WhatsApp"; p.updated=p.updated||Date.now(); personalize(p);
+  p.hero=p.hero||""; p.cta=p.cta||"Consultar por WhatsApp"; p.updated=p.updated||Date.now(); p.profile=p.profile||profileKey(p); personalize(p);
   return p;
 }
 function save(){
@@ -93,11 +84,13 @@ function addProduct(){
   active().products.push({name:"",description:"",price:"",image:""});active().updated=Date.now();save();renderEditor();
 }
 function removeProduct(i){active().products.splice(i,1);active().updated=Date.now();save();renderEditor()}
-function suggest(){
-  const p=active();
-  const key=Object.keys(RUBROS).find(k=>k&&String(p.category).toLowerCase().includes(k.toLowerCase()))||"";
-  p.products=RUBROS[key].map(n=>({name:n,description:"",price:"",image:""}));p.updated=Date.now();save();renderEditor();
-}
+function profileKey(p){const raw=String(p.category||"").toLowerCase();return Object.keys(PERFILES).find(k=>k&&raw.includes(k.toLowerCase()))||""}
+function applyProfile(key,variant){const p=active(),cfg=PERFILES[key]||PERFILES[""],v=variant||"";p.category=key;p.profile=key;p.variant=v;p.style=cfg.theme;p.layout=cfg.layout;p.heroStyle=cfg.hero;p.cta=cfg.cta;p.tagline=cfg.tag;p.description=cfg.copy;const names=VARIANTES[key]&&VARIANTES[key].includes(v)?VARIANTES[key].map((x,i)=>x+" · "+cfg.offers[i]):cfg.offers;p.products=names.map(n=>({name:n,description:"",price:"",image:""}));p.updated=Date.now();save();renderEditor()}
+function suggest(){applyProfile(profileKey(active()),active().variant)}
+function suggestCopy(){const p=active(),cfg=PERFILES[profileKey(p)]||PERFILES[""];p.tagline=p.tagline||cfg.tag;p.description=p.description||cfg.copy;p.updated=Date.now();save();renderEditor()}
+function backupFactory(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({version:"factory-v2",exportedAt:new Date().toISOString(),projects:S.projects},null,2)],{type:"application/json"}));a.download="fabrica-ocarina-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function importFactory(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.projects))throw Error();S.projects=d.projects.map(normalize);S.active=null;save();renderHome()}catch(e){alert("El respaldo no es válido.")}};r.readAsText(f)}
+
 async function readImage(file,max){
   if(!file)return "";
   return new Promise(resolve=>{
@@ -147,7 +140,7 @@ function renderHome(){
   <div class="fx">
     <header class="top">
       <div class="brand"><strong>FÁBRICA OCARINA</strong><small>MINI-WEBS COMERCIALES · PRODUCCIÓN REPETIBLE</small></div>
-      <button class="primary" onclick="newProject()">＋ NUEVO NEGOCIO</button>
+      <div class="topActions"><label class="secondary importBtn">IMPORTAR<input type="file" accept=".json,application/json" onchange="importFactory(this)"></label><button class="secondary" onclick="backupFactory()">RESPALDAR</button><button class="primary" onclick="newProject()">＋ NUEVO NEGOCIO</button></div>
     </header>
     <section class="dashboard">
       <div><span class="eyebrow">CENTRO DE PRODUCCIÓN</span><h1>Fabricá una web. Después otra. Sin empezar de cero.</h1><p>La fábrica concentra datos, oferta, diseño, control de calidad y entrega en un flujo único. El cliente recibe una mini-web; vos conservás el sistema.</p></div>
@@ -265,5 +258,5 @@ function copySummary(){
   const p=active(),text=`NEGOCIO: ${p.name||"Sin nombre"}\nRUBRO: ${p.category||"A completar"}\nOFERTAS: ${p.products.filter(x=>x.name).map(x=>x.name+(x.price?" — "+x.price:"")).join(", ")||"A completar"}\nWHATSAPP: ${p.whatsapp||"A completar"}`;
   navigator.clipboard?.writeText(text).then(()=>state("Resumen copiado")).catch(()=>state("No se pudo copiar"));
 }
-window.newProject=newProject;window.home=home;window.edit=edit;window.duplicate=duplicate;window.removeActive=removeActive;window.set=set;window.updateProduct=updateProduct;window.addProduct=addProduct;window.removeProduct=removeProduct;window.suggest=suggest;window.heroFile=heroFile;window.productFile=productFile;window.nav=nav;window.exportSite=exportSite;window.copySummary=copySummary;
+window.newProject=newProject;window.home=home;window.edit=edit;window.duplicate=duplicate;window.removeActive=removeActive;window.set=set;window.updateProduct=updateProduct;window.addProduct=addProduct;window.removeProduct=removeProduct;window.suggest=suggest;window.heroFile=heroFile;window.productFile=productFile;window.nav=nav;window.exportSite=exportSite;window.copySummary=copySummary;window.applyProfile=applyProfile;window.suggestCopy=suggestCopy;window.backupFactory=backupFactory;window.importFactory=importFactory;
 renderHome();
