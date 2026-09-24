@@ -35,11 +35,18 @@ function load(){
   return {projects:[],active:null,step:0,device:"desktop",filter:"",sort:"updated"};
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function personalize(p){
+  p.layout=p.layout||"cards"; p.heroStyle=p.heroStyle||"photo"; p.logo=p.logo||"";
+  p.tagline=p.tagline||""; p.locationLabel=p.locationLabel||""; p.showPrice=p.showPrice!==false;
+  p.showInstagram=p.showInstagram!==false; p.showAddress=p.showAddress!==false; p.showHours=p.showHours!==false;
+  p.buttonStyle=p.buttonStyle||"solid"; p.footerNote=p.footerNote||"";
+  return p;
+}
 function normalize(p){
   p.products=(p.products||[]).map(x=>({name:x.name||"",description:x.description||"",price:x.price||"",image:x.image||""}));
   p.style=p.style||"calido"; p.category=p.category||""; p.description=p.description||"";
   p.whatsapp=p.whatsapp||""; p.instagram=p.instagram||""; p.address=p.address||""; p.hours=p.hours||"";
-  p.hero=p.hero||""; p.cta=p.cta||"Consultar por WhatsApp"; p.updated=p.updated||Date.now();
+  p.hero=p.hero||""; p.cta=p.cta||"Consultar por WhatsApp"; p.updated=p.updated||Date.now(); personalize(p);
   return p;
 }
 function save(){
@@ -77,7 +84,7 @@ function removeActive(){
   S.projects=S.projects.filter(x=>x.id!==p.id);home();
 }
 function set(k,v){
-  const p=active();if(!p)return;p[k]=v;p.updated=Date.now();save();renderEditor(true);
+  const p=active();if(!p)return;p[k]=v;p.updated=Date.now();personalize(p);save();renderEditor(true);
 }
 function updateProduct(i,k,v){
   const p=active();p.products[i][k]=v;p.updated=Date.now();save();renderEditor(true);
@@ -123,7 +130,7 @@ function checks(p){
     ["Foto principal",!!p.hero,"La portada debe tener una imagen."],
     ["Al menos una oferta",p.products.some(x=>x.name),"El visitante necesita algo concreto para consultar."],
     ["Fotos de oferta",p.products.some(x=>x.image),"Las fotos aumentan la lectura visual del catálogo."],
-    ["Precios / consultar",p.products.some(x=>x.price),"Cada oferta debería indicar precio o "Consultar"."]
+    ["Precios / consultar",p.products.some(x=>x.price),"Cada oferta debería indicar precio o Consultar."]
   ];
 }
 function filtered(){
@@ -230,14 +237,14 @@ function area(k,l,ph){
   const p=active();return `<label class="field"><b>${l}</b><textarea placeholder="${ph}" oninput="set('${k}',this.value)">${esc(p[k])}</textarea></label>`;
 }
 function renderSite(p){
-  const t=THEMES[p.style]||THEMES.calido,offers=p.products.filter(x=>x.name),link=wa(p.whatsapp),inst=ig(p.instagram);
+  const t=THEMES[p.style]||THEMES.calido,offers=p.products.filter(x=>x.name),link=wa(p.whatsapp),inst=ig(p.instagram); personalize(p);
   const site=document.getElementById("site");if(!site)return;
   site.innerHTML=`<div class="web" style="--ink:${t.ink};--accent:${t.accent};--paper:${t.paper}">
-  <section class="webHero" style="background-image:url('${p.hero}')"><div class="shade"></div><div class="webHeroCopy"><small>${esc(p.category||"NEGOCIO LOCAL")}</small><h2>${esc(p.name||"Tu negocio")}</h2><p>${esc(p.description||"Una presentación breve y clara de tu negocio.")}</p></div></section>
+  <section class="webHero" style="background-image:url('${p.hero}')"><div class="shade"></div><div class="webHeroCopy"><small>${esc(p.category||"NEGOCIO LOCAL")}</small><h2>${esc(p.name||"Tu negocio")}</h2><p>${esc(p.tagline||p.description||"Una presentación breve y clara de tu negocio.")}</p></div></section>
   <main class="webBody"><div class="webActions">${link?`<a href="${link}" target="_blank">WHATSAPP</a>`:""}${inst?`<a class="light" href="${inst}" target="_blank">INSTAGRAM</a>`:""}</div>
   <div class="sectionTitle"><small>OFERTA</small><h3>Lo que ofrecemos</h3></div>
-  <div class="webOffers">${offers.length?offers.map(x=>`<article>${x.image?`<img src="${x.image}" alt="">`:""}<div><h4>${esc(x.name)}</h4><p>${esc(x.description)}</p><strong>${esc(x.price||"Consultar")}</strong>${link?`<a href="${link}?text=${encodeURIComponent("Hola, vi tu página y quiero consultar por "+x.name)}" target="_blank">${esc(p.cta||"Consultar por WhatsApp")}</a>`:""}</div></article>`).join(""):'<div class="webEmpty">Las ofertas aparecerán aquí.</div>'}</div>
-  <div class="webInfo">${p.address?`<div><small>UBICACIÓN</small><p>${esc(p.address)}</p></div>`:""}${p.hours?`<div><small>HORARIOS</small><p>${esc(p.hours)}</p></div>`:""}</div></main><footer>Mini-web producida con Fábrica Ocarina</footer></div>`;
+  <div class="webOffers layout-${p.layout}">${offers.length?offers.map(x=>`<article>${x.image?`<img src="${x.image}" alt="">`:""}<div><h4>${esc(x.name)}</h4><p>${esc(x.description)}</p><strong>${p.showPrice?esc(x.price||"Consultar"):""}${p.showPrice?"</strong>":"</strong>"}${link?`<a href="${link}?text=${encodeURIComponent("Hola, vi tu página y quiero consultar por "+x.name)}" target="_blank">${esc(p.cta||"Consultar por WhatsApp")}</a>`:""}</div></article>`).join(""):'<div class="webEmpty">Las ofertas aparecerán aquí.</div>'}</div>
+  <div class="webInfo">${p.showAddress&&p.address?`<div><small>${esc(p.locationLabel||"UBICACIÓN")}</small><p>${esc(p.address)}</p></div>`:""}${p.showHours&&p.hours?`<div><small>HORARIOS</small><p>${esc(p.hours)}</p></div>`:""}</div></main><footer>${esc(p.footerNote||"Mini-web producida con Fábrica Ocarina")}</footer></div>`;
 }
 function exportSite(){
   const p=active(),t=THEMES[p.style]||THEMES.calido,offers=p.products.filter(x=>x.name),link=wa(p.whatsapp),inst=ig(p.instagram);
