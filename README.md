@@ -73,6 +73,9 @@ La rama `v1-funcional-bloqueada` no se modifica.
 
 La estructura de producción permanece bloqueada. La evolución ocurre en la capa de resultado:
 
+- perfiles de producción por rubro
+- preparación automática de estructura, tono, CTA y composición según sector
+- texto base comercial sugerido por rubro
 - personalidad de marca por negocio
 - frase de marca
 - composición de catálogo: tarjetas, destacada o editorial
@@ -86,5 +89,37 @@ La estructura de producción permanece bloqueada. La evolución ocurre en la cap
 ### Regla
 
 **Frente simple. Fondo potente.**
+
+### Capa de fábrica por sector
+
+La fábrica ya no parte de una página genérica. Cada negocio puede entrar por un **perfil de producción**:
+
+- Panadería
+- Gastronomía
+- Peluquería
+- Fotografía
+- Artesanía
+- Productor
+- Profesor
+- Servicios
+- Tienda
+
+El perfil prepara automáticamente una base de trabajo: personalidad visual, composición, portada, CTA, frase comercial, descripción sugerida y tres ofertas iniciales.
+
+Esto no cambia el flujo principal. El operador sigue trabajando con cinco pasos:
+
+**Negocio → Oferta → Marca → Vista → Entrega**
+
+La diferencia está en que la fábrica hace más trabajo por detrás.
+
+### Criterio de producto
+
+El objetivo no es que cada mini-web tenga infinitas opciones. El objetivo es que **cada nueva mini-web salga distinta sin que Elías tenga que diseñar desde cero**.
+
+La fábrica debe convertir experiencia acumulada en presets reutilizables:
+
+**rubro → lógica comercial → preset visual → contenido base → personalización → QA → entrega**
+
+La siguiente profundidad será ampliar la biblioteca de perfiles y crear variantes internas de cada perfil sin modificar la interacción principal.
 
 El operador no debe aprender diseño web. Selecciona opciones, carga contenido y entrega una pieza consistente.
