@@ -4,50 +4,64 @@
 
 **V1 funcional bloqueada:** rama `v1-funcional-bloqueada`.
 
-Esa rama conserva el punto de control de la primera versión funcional.
-
-**Main:** evolución V2 activa.
+**V2.1 Excellence:** `main` — fábrica activa y profundizada sin servidor, sin base de datos y preparada para GitHub Pages.
 
 ## Qué hace ahora
 
-La fábrica ya trabaja como una pequeña línea de producción:
+La fábrica funciona como una línea de producción:
 
-**Biblioteca de negocios → Nuevo negocio → Ficha maestra → Catálogo → Diseño → Control → Exportación**
+**Biblioteca → Nuevo negocio → Ficha maestra → Oferta → Marca → Vista → Control → Exportación**
 
 Incluye:
 
-- biblioteca de negocios
-- crear negocio
-- abrir negocio
-- duplicar negocio
-- eliminar negocio
-- guardado local
-- datos maestros reutilizables
-- sugerencias de ofertas según rubro
+- biblioteca de negocios con búsqueda y orden
+- creación, edición, duplicación y eliminación
+- guardado local automático
+- migración básica desde la primera estructura local
+- ficha maestra reutilizable
+- ofertas sugeridas según rubro
 - catálogo de productos/servicios
-- fotos comprimidas en navegador
+- compresión de fotografías en el navegador
 - cinco personalidades visuales
-- vista previa comercial
-- control previo a la entrega
+- sistema visual aplicado también a la exportación
+- vista previa escritorio/celular
+- indicador de preparación de cada negocio
+- control de calidad previo a la entrega
 - exportación de una mini-web HTML independiente
-- compatibilidad con GitHub Pages
+- resumen de negocio copiable para WhatsApp
 - funcionamiento sin servidor ni base de datos
+- compatibilidad con GitHub Pages
 
-## Principio de producto
+## Arquitectura de producto
 
-Mucho sistema por detrás.
+La fábrica está pensada como herramienta interna de producción de Elías/Ocarina.
 
-Muy poco que aprender por delante.
+**El cliente no necesita conocer la fábrica.**
 
-La fábrica no pretende que Elías diseñe una web nueva cada vez. Pretende que pueda **fabricar muchas webs siguiendo siempre el mismo proceso**.
+La fábrica debe permitir:
 
-## Próximas capas
+1. cargar datos una sola vez;
+2. convertirlos en una página comercial;
+3. revisar visualmente;
+4. detectar faltantes;
+5. exportar;
+6. duplicar el sistema para el siguiente negocio.
 
-1. motor de plantillas por rubro
-2. biblioteca visual reutilizable
-3. más composiciones de portada y catálogo
-4. control de calidad automático
-5. exportación profesional más completa
-6. publicación GitHub Pages más automatizada
+## Regla de excelencia
 
-No se modifica la V1 bloqueada mientras se profundiza la V2 en `main`.
+**Mucho sistema por detrás. Muy poco que aprender por delante.**
+
+No se agregan funciones solo para hacerla más grande. Cada capa debe reducir tiempo de producción, errores o dependencia técnica.
+
+## Próxima evolución
+
+La siguiente capa estratégica no es agregar más botones. Es convertir la fábrica en un **motor de plantillas y entrega**:
+
+- composiciones específicas por rubro sin duplicar código;
+- biblioteca visual reutilizable;
+- variantes de portada/oferta;
+- control de contenido más estricto;
+- paquete de entrega consistente;
+- preparación para una futura publicación automatizada, sin depender de Vercel.
+
+La rama `v1-funcional-bloqueada` no se modifica.
