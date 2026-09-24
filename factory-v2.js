@@ -11,7 +11,7 @@ function v2edit(id){V2.active=id;v2renderEditor(0)}
 function v2dup(id){const p=V2.projects.find(x=>x.id===id),c=JSON.parse(JSON.stringify(p));c.id=Date.now().toString();c.name=(p.name||"Negocio")+" — copia";c.updated=Date.now();V2.projects.unshift(c);V2.active=c.id;v2save();v2renderEditor(0)}
 function v2delete(){if(confirm("¿Eliminar este negocio?")){V2.projects=V2.projects.filter(x=>x.id!==V2.active);v2goHome()}}
 function v2active(){return V2.projects.find(x=>x.id===V2.active)}
-function v2set(k,v){const p=v2active();p[k]=v;p.updated=Date.now();v2save();v2renderEditor(V2.step||0)}
+function v2set(k,v){const p=v2active();p[k]=v;p.updated=Date.now();v2save();v2preview()}
 function v2add(){const p=v2active();p.products.push({name:"",description:"",price:"",image:""});v2save();v2renderEditor(1)}
 function v2remove(i){v2active().products.splice(i,1);v2save();v2renderEditor(1)}
 function v2suggest(){const p=v2active(),key=Object.keys(V2RUBROS).find(k=>(p.category||"").toLowerCase().includes(k.toLowerCase()))||"Servicios";p.products=V2RUBROS[key].map(n=>({name:n,description:"",price:"",image:""}));v2save();v2renderEditor(1)}
