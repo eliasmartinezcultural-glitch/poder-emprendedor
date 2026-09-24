@@ -4,7 +4,9 @@
 
 **V1 funcional bloqueada:** rama `v1-funcional-bloqueada`.
 
-**V2.1 Excellence:** `main` — fábrica activa y profundizada sin servidor, sin base de datos y preparada para GitHub Pages.
+**V2.1 Excellence funcional:** rama `v2.1-functional-locked` — estructura funcional congelada como respaldo.
+
+**V2.2 Product layer:** `main` — misma interacción y arquitectura de producción, con personalización profunda y salida final más profesional.
 
 ## Qué hace ahora
 
@@ -65,3 +67,24 @@ La siguiente capa estratégica no es agregar más botones. Es convertir la fábr
 - preparación para una futura publicación automatizada, sin depender de Vercel.
 
 La rama `v1-funcional-bloqueada` no se modifica.
+
+
+## Capa de producto V2.2
+
+La estructura de producción permanece bloqueada. La evolución ocurre en la capa de resultado:
+
+- personalidad de marca por negocio
+- frase de marca
+- composición de catálogo: tarjetas, destacada o editorial
+- portada fotográfica, minimal o inmersiva
+- visibilidad configurable de precios, Instagram, ubicación y horarios
+- cierre personalizado
+- preview y exportación sincronizados
+- responsive mobile-first
+- misma información maestra alimentando preview y producto final
+
+### Regla
+
+**Frente simple. Fondo potente.**
+
+El operador no debe aprender diseño web. Selecciona opciones, carga contenido y entrega una pieza consistente.
