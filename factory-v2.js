@@ -209,9 +209,14 @@ function stepOffers(p){
   <div class="next"><button class="secondary" onclick="nav(0)">← ATRÁS</button><button class="primary" onclick="nav(2)">MARCA →</button></div>`;
 }
 function stepDesign(p){
-  return `<span class="eyebrow">03 · MARCA</span><h1>Elegí una personalidad</h1><p class="hint">No diseñás desde cero. Elegís una dirección y la fábrica compone.</p>
+  return `<span class="eyebrow">03 · MARCA</span><h1>Personalizá sin diseñar.</h1><p class="hint">La fábrica mantiene la estructura y cambia la personalidad de cada negocio.</p>
+  <label class="field"><b>Frase de marca</b><input value="${esc(p.tagline)}" placeholder="Ej.: Hecho cerca. Hecho para vos." oninput="set('tagline',this.value)"></label>
   <div class="themes">${Object.entries(THEMES).map(([k,t])=>`<button class="${p.style===k?"selected":""}" onclick="set('style','${k}')"><i style="background:${t.ink}"></i><div><b>${t.name}</b><small>${t.desc}</small></div><span>✓</span></button>`).join("")}</div>
-  <div class="note"><b>Sistema visual:</b> la identidad elegida se aplica a portada, botones, etiquetas, tarjetas y página exportada. No cambia la estructura comercial.</div>
+  <div class="designGrid"><label class="field"><b>Composición</b><select onchange="set('layout',this.value)"><option value="cards" ${p.layout==="cards"?"selected":""}>Tarjetas</option><option value="featured" ${p.layout==="featured"?"selected":""}>Oferta destacada</option><option value="list" ${p.layout==="list"?"selected":""}>Lista editorial</option></select></label>
+  <label class="field"><b>Portada</b><select onchange="set('heroStyle',this.value)"><option value="photo" ${p.heroStyle==="photo"?"selected":""}>Fotográfica</option><option value="minimal" ${p.heroStyle==="minimal"?"selected":""}>Minimal</option><option value="immersive" ${p.heroStyle==="immersive"?"selected":""}>Inmersiva</option></select></label></div>
+  <div class="toggles"><label><input type="checkbox" ${p.showPrice?"checked":""} onchange="set('showPrice',this.checked)"> Mostrar precios</label><label><input type="checkbox" ${p.showInstagram?"checked":""} onchange="set('showInstagram',this.checked)"> Instagram</label><label><input type="checkbox" ${p.showAddress?"checked":""} onchange="set('showAddress',this.checked)"> Ubicación</label><label><input type="checkbox" ${p.showHours?"checked":""} onchange="set('showHours',this.checked)"> Horarios</label></div>
+  <label class="field"><b>Cierre</b><input value="${esc(p.footerNote)}" placeholder="Ej.: Consultá por pedidos especiales." oninput="set('footerNote',this.value)"></label>
+  <div class="note"><b>Producto:</b> personalización profunda por detrás; interacción mínima por delante.</div>
   <div class="next"><button class="secondary" onclick="nav(1)">← ATRÁS</button><button class="primary" onclick="nav(3)">VER PÁGINA →</button></div>`;
 }
 function stepPreview(p){
@@ -237,13 +242,14 @@ function area(k,l,ph){
   const p=active();return `<label class="field"><b>${l}</b><textarea placeholder="${ph}" oninput="set('${k}',this.value)">${esc(p[k])}</textarea></label>`;
 }
 function renderSite(p){
-  const t=THEMES[p.style]||THEMES.calido,offers=p.products.filter(x=>x.name),link=wa(p.whatsapp),inst=ig(p.instagram); personalize(p);
+  personalize(p); const t=THEMES[p.style]||THEMES.calido,offers=p.products.filter(x=>x.name),link=wa(p.whatsapp),inst=ig(p.instagram);
   const site=document.getElementById("site");if(!site)return;
+  const offerClass=p.layout==="featured"?"layout-featured":p.layout==="list"?"layout-list":"layout-cards";
   site.innerHTML=`<div class="web" style="--ink:${t.ink};--accent:${t.accent};--paper:${t.paper}">
-  <section class="webHero" style="background-image:url('${p.hero}')"><div class="shade"></div><div class="webHeroCopy"><small>${esc(p.category||"NEGOCIO LOCAL")}</small><h2>${esc(p.name||"Tu negocio")}</h2><p>${esc(p.tagline||p.description||"Una presentación breve y clara de tu negocio.")}</p></div></section>
-  <main class="webBody"><div class="webActions">${link?`<a href="${link}" target="_blank">WHATSAPP</a>`:""}${inst?`<a class="light" href="${inst}" target="_blank">INSTAGRAM</a>`:""}</div>
+  <section class="webHero hero-${p.heroStyle}" style="background-image:url('${p.hero}')"><div class="shade"></div><div class="webHeroCopy"><small>${esc(p.category||"NEGOCIO LOCAL")}</small><h2>${esc(p.name||"Tu negocio")}</h2><p>${esc(p.tagline||p.description||"Una presentación breve y clara de tu negocio.")}</p></div></section>
+  <main class="webBody"><div class="webActions">${link?`<a href="${link}" target="_blank">WHATSAPP</a>`:""}${p.showInstagram&&inst?`<a class="light" href="${inst}" target="_blank">INSTAGRAM</a>`:""}</div>
   <div class="sectionTitle"><small>OFERTA</small><h3>Lo que ofrecemos</h3></div>
-  <div class="webOffers layout-${p.layout}">${offers.length?offers.map(x=>`<article>${x.image?`<img src="${x.image}" alt="">`:""}<div><h4>${esc(x.name)}</h4><p>${esc(x.description)}</p><strong>${p.showPrice?esc(x.price||"Consultar"):""}${p.showPrice?"</strong>":"</strong>"}${link?`<a href="${link}?text=${encodeURIComponent("Hola, vi tu página y quiero consultar por "+x.name)}" target="_blank">${esc(p.cta||"Consultar por WhatsApp")}</a>`:""}</div></article>`).join(""):'<div class="webEmpty">Las ofertas aparecerán aquí.</div>'}</div>
+  <div class="webOffers ${offerClass}">${offers.length?offers.map(x=>`<article>${x.image?`<img src="${x.image}" alt="">`:""}<div><h4>${esc(x.name)}</h4><p>${esc(x.description)}</p>${p.showPrice?`<strong>${esc(x.price||"Consultar")}</strong>`:""}${link?`<a href="${link}?text=${encodeURIComponent("Hola, vi tu página y quiero consultar por "+x.name)}" target="_blank">${esc(p.cta||"Consultar por WhatsApp")}</a>`:""}</div></article>`).join(""):'<div class="webEmpty">Las ofertas aparecerán aquí.</div>'}</div>
   <div class="webInfo">${p.showAddress&&p.address?`<div><small>${esc(p.locationLabel||"UBICACIÓN")}</small><p>${esc(p.address)}</p></div>`:""}${p.showHours&&p.hours?`<div><small>HORARIOS</small><p>${esc(p.hours)}</p></div>`:""}</div></main><footer>${esc(p.footerNote||"Mini-web producida con Fábrica Ocarina")}</footer></div>`;
 }
 function exportSite(){
