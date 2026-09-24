@@ -35,6 +35,7 @@ function personalize(p){
 }
 function normalize(p){
   p.products=(p.products||[]).map(x=>({name:x.name||"",description:x.description||"",price:x.price||"",image:x.image||""}));
+  p.production=p.production||{status:"draft",deliveryCount:0,lastDeliveredAt:"",lastQA:""};
   p.style=p.style||"calido"; p.category=p.category||""; p.description=p.description||"";
   p.whatsapp=p.whatsapp||""; p.instagram=p.instagram||""; p.address=p.address||""; p.hours=p.hours||"";
   p.hero=p.hero||""; p.cta=p.cta||"Consultar por WhatsApp"; p.updated=p.updated||Date.now(); p.profile=p.profile||profileKey(p); personalize(p);
@@ -107,6 +108,19 @@ async function heroFile(input){
 }
 async function productFile(i,input){
   const p=active();p.products[i].image=await readImage(input.files[0],1000);p.updated=Date.now();save();renderEditor();
+}
+const REQUIREMENTS={Panadería:3,Fotografía:3,Tienda:3,Gastronomía:1,Peluquería:1,Artesanía:1,Productor:1,Profesor:1,Servicios:1};
+function readiness(p){
+  const offers=p.products.filter(x=>x.name),missing=[];
+  if(!p.name)missing.push("Nombre");
+  if(!p.whatsapp)missing.push("WhatsApp");
+  if(p.profile!=="Profesor"&&p.profile!=="Servicios"&&!p.hero)missing.push("Foto principal");
+  const need=REQUIREMENTS[p.profile]||1;
+  if(offers.length<need)missing.push(need===3?"3 ofertas":"1 oferta");
+  if(offers.length&&offers.every(x=>!x.image)&&p.profile!=="Profesor"&&p.profile!=="Servicios")missing.push("Foto de oferta");
+  if((p.profile==="Gastronomía"||p.profile==="Productor")&&!p.address)missing.push("Ubicación");
+  if(p.profile==="Gastronomía"&&!p.hours)missing.push("Horarios");
+  return {ready:missing.length===0,missing};
 }
 function score(p){
   let n=0,total=8;
@@ -219,13 +233,14 @@ function stepPreview(p){
   <div class="note">Probá <b>CELULAR</b> arriba a la derecha. Ese es el formato prioritario para compartir por WhatsApp.</div>
   <div class="next"><button class="secondary" onclick="nav(2)">← MARCA</button><button class="primary" onclick="nav(4)">CONTROL →</button></div>`;
 }
+function markDelivered(){const p=active(),r=readiness(p);if(!r.ready){alert("La pieza todavía tiene datos pendientes: "+r.missing.join(", "));return}p.production=p.production||{status:"draft",deliveryCount:0,lastDeliveredAt:"",lastQA:""};p.production.status="delivered";p.production.deliveryCount=(p.production.deliveryCount||0)+1;p.production.lastDeliveredAt=new Date().toISOString();p.production.lastQA=new Date().toISOString();p.updated=Date.now();save();renderEditor()}
+function copyDelivery(){const p=active(),r=readiness(p);const text="PRESENTACIÓN · "+(p.name||"Negocio")+"\nEstado: "+(r.ready?"LISTO PARA ENTREGAR":"EN PREPARACIÓN")+"\n"+(r.missing.length?"Falta: "+r.missing.join(", "):"Control completo")+"\nPieza: mini-web HTML\nContacto: "+(p.whatsapp||"A completar");navigator.clipboard?.writeText(text).then(()=>state("Presentación copiada")).catch(()=>state("No se pudo copiar"))}
 function stepDelivery(p){
-  const rows=checks(p),good=rows.filter(x=>x[1]).length;
+  const rows=checks(p),good=rows.filter(x=>x[1]).length,r=readiness(p);
   return `<span class="eyebrow">05 · ENTREGA</span><h1>Control de calidad</h1><p class="hint">No exportamos una página incompleta sin mostrarte qué falta.</p>
   <div class="score"><div><b>${score(p)}%</b><span>preparación</span></div><div class="bar"><i style="width:${score(p)}%"></i></div></div>
   <div class="checks">${rows.map(x=>`<div class="${x[1]?"ok":"warn"}"><b>${x[1]?"✓":"○"} ${x[0]}</b><small>${x[2]}</small></div>`).join("")}</div>
-  <button class="primary export" onclick="exportSite()">↓ EXPORTAR MINI-WEB</button>
-  <button class="secondary full" onclick="copySummary()">COPIAR RESUMEN PARA WHATSAPP</button>
+  <div class="deliveryBox"><b>${r.ready?"LISTO PARA ENTREGAR":"PREPARACIÓN DE ENTREGA"}</b><small>${r.ready?"Control completo.":"Falta: "+r.missing.join(" · ")}</small><div class="deliveryActions"><button class="primary export" onclick="exportSite()">↓ PIEZA HTML</button><button class="secondary" onclick="copyDelivery()">COPIAR PRESENTACIÓN</button>${r.ready?`<button class="primary" onclick="markDelivered()">MARCAR ENTREGADO</button>`:""}</div></div><button class="secondary full" onclick="copySummary()">COPIAR RESUMEN PARA WHATSAPP</button>
   <div class="note"><b>${good}/${rows.length}</b> controles completos. La exportación sigue disponible para que puedas producir versiones en proceso.</div>
   <div class="next"><button class="secondary" onclick="nav(3)">← VISTA</button></div>`;
 }
@@ -259,5 +274,5 @@ function copySummary(){
   const p=active(),text=`NEGOCIO: ${p.name||"Sin nombre"}\nRUBRO: ${p.category||"A completar"}\nOFERTAS: ${p.products.filter(x=>x.name).map(x=>x.name+(x.price?" — "+x.price:"")).join(", ")||"A completar"}\nWHATSAPP: ${p.whatsapp||"A completar"}`;
   navigator.clipboard?.writeText(text).then(()=>state("Resumen copiado")).catch(()=>state("No se pudo copiar"));
 }
-window.newProject=newProject;window.home=home;window.edit=edit;window.duplicate=duplicate;window.removeActive=removeActive;window.set=set;window.updateProduct=updateProduct;window.addProduct=addProduct;window.removeProduct=removeProduct;window.suggest=suggest;window.heroFile=heroFile;window.productFile=productFile;window.nav=nav;window.exportSite=exportSite;window.copySummary=copySummary;window.applyProfile=applyProfile;window.suggestCopy=suggestCopy;window.backupFactory=backupFactory;window.importFactory=importFactory;
+window.markDelivered=markDelivered;window.copyDelivery=copyDelivery;window.newProject=newProject;window.home=home;window.edit=edit;window.duplicate=duplicate;window.removeActive=removeActive;window.set=set;window.updateProduct=updateProduct;window.addProduct=addProduct;window.removeProduct=removeProduct;window.suggest=suggest;window.heroFile=heroFile;window.productFile=productFile;window.nav=nav;window.exportSite=exportSite;window.copySummary=copySummary;window.applyProfile=applyProfile;window.suggestCopy=suggestCopy;window.backupFactory=backupFactory;window.importFactory=importFactory;
 renderHome();
