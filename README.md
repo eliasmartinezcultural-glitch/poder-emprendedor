@@ -123,3 +123,16 @@ La fábrica debe convertir experiencia acumulada en presets reutilizables:
 La siguiente profundidad será ampliar la biblioteca de perfiles y crear variantes internas de cada perfil sin modificar la interacción principal.
 
 El operador no debe aprender diseño web. Selecciona opciones, carga contenido y entrega una pieza consistente.
+
+
+## V2.3 · Fábrica de perfiles
+
+La capa de producto incorpora una biblioteca interna de perfiles comerciales. Cada rubro puede definir personalidad visual, composición, portada, CTA, frase, descripción y ofertas iniciales. Además, cada rubro puede tener variantes comerciales sin cambiar el flujo de cinco pasos.
+
+También se incorporó un respaldo local de la fábrica mediante JSON: **RESPALDAR → archivo → IMPORTAR**. Esto protege la biblioteca de negocios sin servidor ni base de datos y mantiene el proyecto compatible con GitHub Pages.
+
+### Principio de escalabilidad
+
+**Un solo flujo de producción + muchos presets internos.**
+
+El objetivo es que agregar un nuevo rubro o variante aumente la capacidad de fabricación, no la complejidad de uso.
